@@ -12,6 +12,9 @@ import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
 import Login from './Login';
 import Register from './Register';
+import ProtectedRoute from './ProtectedRoute';
+import MessagePopup from './MessagePopup';
+import InfoTooltip from './InfoTooltip';
 
 function App() {
   const [currentUser, setCurrentUser] = React.useState('');
@@ -20,9 +23,11 @@ function App() {
   const [isEditProfilePopupOpen, setIspProfilePopupOpen] =
     React.useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
+  const [isDeletePopupOpen, setIsDeletePopupOpen] = React.useState(false);
+  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(true);
   const [selectedCard, setSelectedCard] = React.useState();
   const [cards, setCards] = React.useState([]);
-  const [isLoggedIn, setIsloggedIn] = React.useState(false);
+  const [isLoggedIn, setIsloggedIn] = React.useState(true);
   // const [isAuthorized, setIsAuthorized] = React.useState(false);
 
   React.useEffect(() => {
@@ -52,6 +57,8 @@ function App() {
     setIspProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setSelectedCard(false);
+    setIsDeletePopupOpen(false);
+    setIsInfoTooltipOpen(false);
     document.removeEventListener('keydown', handleEscape);
   }
 
@@ -103,6 +110,8 @@ function App() {
     isEditAvatarPopupOpen ||
     isAddPlacePopupOpen ||
     isEditProfilePopupOpen ||
+    isDeletePopupOpen ||
+    isInfoTooltipOpen ||
     selectedCard;
 
   React.useEffect(() => {
@@ -122,12 +131,9 @@ function App() {
       <div className="root">
         <CurrentUserContext.Provider value={currentUser}>
           <div className="page-content">
-                <Header />
             <Switch>
-              <Route exact path="/">
-                {isLoggedIn ? <Redirect to="/" /> : <Redirect to="/login" />}
-                
-
+              <ProtectedRoute exact path="/" loggedIn={isLoggedIn}>
+                <Header />
                 <Main
                   onEditProfileClick={handleEditProfileClick}
                   onAddPlaceClick={handleAddPlaceClick}
@@ -170,14 +176,35 @@ function App() {
                   onClose={closeAllPopups}
                   onOutsideClick={handleOutsideClick}
                 />
-              </Route>
+
+                <MessagePopup
+                  isOpen={isDeletePopupOpen}
+                  onClose={closeAllPopups}
+                  onOutsideClick={handleOutsideClick}
+                >
+                  <h2 className="popup__title popup__title_delete">
+                    Are you sure?
+                  </h2>
+                  <button className="popup__save-btn" name="Yes" type="submit">
+                    Yes
+                  </button>
+                </MessagePopup>
+              </ProtectedRoute>
+
               <Route path="/login">
+                <Header />
                 <Login />
               </Route>
 
-              <Route path='/register'>
-              <Register/>
-                </Route>
+              <Route path="/register">
+                <Header />
+                <Register />
+                <InfoTooltip
+                  isOpen={isInfoTooltipOpen}
+                  onClose={closeAllPopups}
+                  onOutsideClick={handleOutsideClick}
+                />
+              </Route>
             </Switch>
             <Footer />
           </div>
