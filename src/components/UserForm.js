@@ -1,19 +1,37 @@
 import React from 'react';
 
-function UserForm({ formTitle, formText, formButton }) {
+function UserForm({ formTitle, formText, formButton, onSubmit }) {
 
-  const [name, setName] = React.useState('')
   const [email, setEmail] = React.useState('')
+  const [password, setPassword] = React.useState('')
+
+  function handleEmailChange(evt){
+    setEmail(evt.target.value)
+  }
+
+  function handlePasswordChange(evt){
+    setPassword(evt.target.value)
+  }
+
+  function handleSubmit(evt){
+    evt.preventDefault();
+    onSubmit({
+        password, 
+        email
+    })
+  }
 
   return (
-    <form className="user-form">
+    <form className="user-form" onSubmit={handleSubmit}>
       <h2 className="user-form__title">{formTitle}</h2>
       <input
         className="user-form__field"
-        type=""
-        name=""
+        type="email"
+        name="email"
         required
         placeholder="Email"
+        onChange={handleEmailChange}
+        value={email.value}
       ></input>
 
       <input
@@ -22,6 +40,8 @@ function UserForm({ formTitle, formText, formButton }) {
         name="password"
         required
         placeholder="Password"
+        onChange={handlePasswordChange}
+        value={password}
       ></input>
 
       <button className="user-form__button hover-animate" type="submit" default="Log in">
