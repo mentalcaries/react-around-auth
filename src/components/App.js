@@ -1,5 +1,5 @@
 import React from 'react';
-import {Switch, Route, Redirect} from 'react-router-dom';
+import {Switch, Route, Redirect, Link} from 'react-router-dom';
 import Header from './Header';
 import Main from './Main';
 import PopupWithForm from './PopupWithForm';
@@ -24,7 +24,7 @@ function App() {
     React.useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
   const [isDeletePopupOpen, setIsDeletePopupOpen] = React.useState(false);
-  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(true);
+  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState();
   const [cards, setCards] = React.useState([]);
   const [isLoggedIn, setIsloggedIn] = React.useState(true);
@@ -192,12 +192,12 @@ function App() {
               </ProtectedRoute>
 
               <Route path="/login">
-                <Header />
+                <Header> <Link className="header__link hover-animate" to="/register"> <p>Sign up</p></Link> </Header>
                 <Login />
               </Route>
 
               <Route path="/register">
-                <Header />
+              <Header> <Link className="header__link hover-animate" to="/login"> <p>Log in</p></Link> </Header>
                 <Register />
                 <InfoTooltip
                   isOpen={isInfoTooltipOpen}

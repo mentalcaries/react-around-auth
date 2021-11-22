@@ -1,6 +1,10 @@
 import React from 'react';
 
 function UserForm({ formTitle, formText, formButton }) {
+
+  const [name, setName] = React.useState('')
+  const [email, setEmail] = React.useState('')
+
   return (
     <form className="user-form">
       <h2 className="user-form__title">{formTitle}</h2>
@@ -20,7 +24,7 @@ function UserForm({ formTitle, formText, formButton }) {
         placeholder="Password"
       ></input>
 
-      <button className="user-form__button" type="submit" default="Log in">
+      <button className="user-form__button hover-animate" type="submit" default="Log in">
         {formButton}
       </button>
       <p className="user-form__text">{formText}</p>

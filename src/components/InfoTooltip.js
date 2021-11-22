@@ -1,13 +1,15 @@
 import React from "react";
 import MessagePopup from "./MessagePopup";
 import success from "../images/success.svg"
+import failure from "../images/failure.svg"
 
-function InfoTooltip({isOpen, onClose, onOutsideClick}){
+function InfoTooltip({isOpen, onClose, onOutsideClick, isSuccess}){
 
   return(
     <MessagePopup isOpen={isOpen} onClose={onClose} onOutsideClick={onOutsideClick}>
-      <img src={success} alt="Success" />
-      <h2>Approved</h2>
+      
+      {isSuccess? <img className="tooltips__image" src={success} alt="Signup Successful" /> : <img className="tooltips__image" src={failure} alt="Signup Failed" /> }
+      {isSuccess?  <h2 className="tooltips__text">Success! You have now been registered.</h2> : <h2 className="tooltips__text">Success! You have now been registered.</h2>}
     </MessagePopup>
   )
 }
