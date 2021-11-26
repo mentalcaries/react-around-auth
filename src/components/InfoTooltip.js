@@ -9,7 +9,7 @@ function InfoTooltip({isOpen, onClose, onOutsideClick, isSuccess}){
     <MessagePopup isOpen={isOpen} onClose={onClose} onOutsideClick={onOutsideClick}>
       
       {isSuccess? <img className="tooltips__image" src={success} alt="Signup Successful" /> : <img className="tooltips__image" src={failure} alt="Signup Failed" /> }
-      {isSuccess?  <h2 className="tooltips__text">Success! You have now been registered.</h2> : <h2 className="tooltips__text">Success! You have now been registered.</h2>}
+      {isSuccess?  <h2 className="tooltips__text">Success! You have now been registered.</h2> : <h2 className="tooltips__text">Oops, something went wrong! Please try again.</h2>}
     </MessagePopup>
   )
 }

@@ -1,20 +1,19 @@
-import React, { useState } from "react";
 import UserForm from "./UserForm";
-import * as auth from '../utils/auth'
 
-function Register(){
+function Register({handleRegister}){
 
-  function handleRegisterSubmit(userData){
-    // const {password, email} = userData;
-
-    auth.register(userData)
-  }
+  // function handleRegisterSubmit(userData){
+  //   const {password, email} = userData;
+  //   console.log(password)
+  //   auth.register(password, email)
+  // }
+  
 
   return(
 <UserForm formTitle="Sign Up"
       formText="Already a member? Log in here!"
       formButton="Sign Up"
-      onSubmit={handleRegisterSubmit}
+      onSubmit={handleRegister}
 />
   )
 }

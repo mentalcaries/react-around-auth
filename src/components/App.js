@@ -1,33 +1,35 @@
-import React from 'react';
-import {Switch, Route, Redirect, Link} from 'react-router-dom';
-import Header from './Header';
-import Main from './Main';
-import PopupWithForm from './PopupWithForm';
-import ImagePopup from './ImagePopup';
-import Footer from './Footer';
-import {api} from '../utils/api';
-import {CurrentUserContext} from '../contexts/CurrentUserContext';
-import EditProfilePopup from './EditProfilePopup';
-import EditAvatarPopup from './EditAvatarPopup';
-import AddPlacePopup from './AddPlacePopup';
-import Login from './Login';
-import Register from './Register';
-import ProtectedRoute from './ProtectedRoute';
-import MessagePopup from './MessagePopup';
-import InfoTooltip from './InfoTooltip';
+import React from "react";
+import { Switch, Route, Redirect, Link, useHistory } from "react-router-dom";
+import Header from "./Header";
+import Main from "./Main";
+import PopupWithForm from "./PopupWithForm";
+import ImagePopup from "./ImagePopup";
+import Footer from "./Footer";
+import { api } from "../utils/api";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
+import EditProfilePopup from "./EditProfilePopup";
+import EditAvatarPopup from "./EditAvatarPopup";
+import AddPlacePopup from "./AddPlacePopup";
+import Login from "./Login";
+import Register from "./Register";
+import ProtectedRoute from "./ProtectedRoute";
+import MessagePopup from "./MessagePopup";
+import InfoTooltip from "./InfoTooltip";
+import { register, login } from "../utils/auth";
 
 function App() {
-  const [currentUser, setCurrentUser] = React.useState('');
+  const [currentUser, setCurrentUser] = React.useState("");
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] =
     React.useState(false);
   const [isEditProfilePopupOpen, setIspProfilePopupOpen] =
     React.useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
   const [isDeletePopupOpen, setIsDeletePopupOpen] = React.useState(false);
-  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState();
   const [cards, setCards] = React.useState([]);
-  const [isLoggedIn, setIsloggedIn] = React.useState(true);
+  const [isLoggedIn, setIsloggedIn] = React.useState(false);
+  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
+  const [isNowRegistered, setIsNowRegistered] = React.useState(false);
   // const [isAuthorized, setIsAuthorized] = React.useState(false);
 
   React.useEffect(() => {
@@ -59,11 +61,11 @@ function App() {
     setSelectedCard(false);
     setIsDeletePopupOpen(false);
     setIsInfoTooltipOpen(false);
-    document.removeEventListener('keydown', handleEscape);
+    document.removeEventListener("keydown", handleEscape);
   }
 
   function handleOutsideClick(evt) {
-    if (evt.target.className === 'popup__overlay') {
+    if (evt.target.className === "popup__overlay") {
       closeAllPopups();
     }
   }
@@ -116,14 +118,45 @@ function App() {
 
   React.useEffect(() => {
     anyPopupOpen
-      ? document.addEventListener('keydown', handleEscape)
-      : document.removeEventListener('keydown', handleEscape);
+      ? document.addEventListener("keydown", handleEscape)
+      : document.removeEventListener("keydown", handleEscape);
   });
 
   function handleEscape(evt) {
-    if (evt.key === 'Escape') {
+    if (evt.key === "Escape") {
       closeAllPopups();
     }
+  }
+  const history = useHistory();
+
+  function handleRegisterSubmit(userData) {
+    const { password, email } = userData;
+    register(password, email)
+    .then(() => {
+      setIsNowRegistered(true);
+      setIsInfoTooltipOpen(true);
+      setTimeout(()=> {
+        setIsInfoTooltipOpen(false);
+        // setIsNowRegistered(false);
+      }, 1000)
+    })
+    .catch(()=>{
+      setIsNowRegistered(false);
+      setIsInfoTooltipOpen(true);
+      setTimeout(()=> {
+        setIsInfoTooltipOpen(false);
+        // setIsNowRegistered(false);
+      }, 1000)
+    })
+  }
+  function handleLoginSubmit({ password, email }) {
+    if (!password || !email) {
+      return;
+    }
+    login(password, email).then(() => {
+      setIsloggedIn(true);
+      history.push("/");
+    });
   }
 
   return (
@@ -192,15 +225,28 @@ function App() {
               </ProtectedRoute>
 
               <Route path="/login">
-                <Header> <Link className="header__link hover-animate" to="/register"> <p>Sign up</p></Link> </Header>
-                <Login />
+                <Header>
+                  {" "}
+                  <Link className="header__link hover-animate" to="/register">
+                    {" "}
+                    <p>Sign up</p>
+                  </Link>{" "}
+                </Header>
+                <Login handleLogin={handleLoginSubmit} />
               </Route>
 
               <Route path="/register">
-              <Header> <Link className="header__link hover-animate" to="/login"> <p>Log in</p></Link> </Header>
-                <Register />
+                <Header>
+                  {" "}
+                  <Link className="header__link hover-animate" to="/login">
+                    {" "}
+                    <p>Log in</p>
+                  </Link>{" "}
+                </Header>
+                <Register handleRegister={handleRegisterSubmit} />
                 <InfoTooltip
                   isOpen={isInfoTooltipOpen}
+                  isSuccess={isNowRegistered}
                   onClose={closeAllPopups}
                   onOutsideClick={handleOutsideClick}
                 />
