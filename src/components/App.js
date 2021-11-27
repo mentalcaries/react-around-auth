@@ -29,9 +29,10 @@ function App() {
   const [cards, setCards] = React.useState([]);
   const [isLoggedIn, setIsloggedIn] = React.useState(false);
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
-  const [isSuccess, setIsSuccess]=React.useState(false)
+  const [isSuccess, setIsSuccess] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [userEmail, setUserEmail] = React.useState("");
   // const [isAuthorized, setIsAuthorized] = React.useState(false);
 
   React.useEffect(() => {
@@ -39,7 +40,6 @@ function App() {
       setCurrentUser(res);
     });
   }, []);
-
 
   function handleEditAvatarClick() {
     setIsEditAvatarPopupOpen(true);
@@ -133,179 +133,194 @@ function App() {
 
   function handleRegisterSubmit() {
     register(password, email)
-    .then((res) => {
-      if(res){
-        setIsSuccess(true);
-        setIsInfoTooltipOpen(true);
-        setTimeout(()=> {
-          setIsInfoTooltipOpen(false);
-          // setIsNowRegistered(false);
-        }, 1500)
-        history.push("/login")
-      }
-      else{
+      .then((res) => {
+        if (res) {
+          setIsSuccess(true);
+          setIsInfoTooltipOpen(true);
+          setTimeout(() => {
+            setIsInfoTooltipOpen(false);
+          }, 1500);
+          history.push("/login");
+        } else {
+          setIsSuccess(false);
+          setIsInfoTooltipOpen(true);
+        }
+      })
+      .catch(() => {
         setIsSuccess(false);
-        setIsInfoTooltipOpen(true)
-      }
-    })
-    .catch(()=>{
-      setIsSuccess(false);
-      setIsInfoTooltipOpen(true);
-      setTimeout(()=> {
-        setIsInfoTooltipOpen(false);
-        // setIsNowRegistered(false);
-      }, 1000)
-      
-    })
+        setIsInfoTooltipOpen(true);
+        setTimeout(() => {
+          setIsInfoTooltipOpen(false);
+        }, 1000);
+      });
   }
 
-  const history = useHistory()
+  const history = useHistory();
 
   function handleLoginSubmit({ password, email }) {
     if (!password || !email) {
       return;
     }
     authorise(password, email)
-    .then((data) => {
-      if(!data){
-        return
-      }
-      else {
-        setPassword('')
-        setEmail('')
-        setIsloggedIn(true);
-        history.push("/");
-      }
-    })
-    .catch((err)=>console.log(err))
-    setIsInfoTooltipOpen(true)
-    setIsSuccess(false)
+      .then((data) => {
+        if (!data) {
+          return;
+        } else {
+          setPassword("");
+          setEmail("");
+          setIsloggedIn(true);
+          history.push("/");
+        }
+      })
+      .catch((err) => console.log(err));
+    setIsInfoTooltipOpen(true);
+    setIsSuccess(false);
   }
 
-  function tokenCheck(){
-    const jwt = localStorage.getItem('jwt')
-    if (jwt){
-      verifyUser(jwt)
-      .then((res)=>{
-        setEmail(res.email)
-        setIsloggedIn(true)
-        history.push("/")
-      })
+  React.useEffect(()=>{
+    checkToken()
+  }, [isLoggedIn])
+  
+  function checkToken() {
+    const jwt = localStorage.getItem("jwt");
+    if (!jwt) {
+      //handle error case
+      // throw Error ("Invalid JWT")
+      return
+      
+    } else {
+        verifyUser(jwt).then((res) => {
+          if (!res) {
+            return;
+          } else 
+          setUserEmail(res.email);
+          setIsloggedIn(true);
+          history.push("/");
+        });
+      
     }
   }
 
-  return (
-    <div className="App">
-      <div className="root">
-        <CurrentUserContext.Provider value={currentUser}>
-          <div className="page-content">
-            <Switch>
-              <ProtectedRoute exact path="/" loggedIn={isLoggedIn}>
-                <Header />
-                <Main
-                  onEditProfileClick={handleEditProfileClick}
-                  onAddPlaceClick={handleAddPlaceClick}
-                  onEditAvatarClick={handleEditAvatarClick}
-                  onCardClick={handleCardClick}
-                  cards={cards}
-                  onCardLike={handleCardLike}
-                  onCardDelete={handleDeleteCard}
-                />
 
-                <EditProfilePopup
-                  isOpen={isEditProfilePopupOpen}
-                  onClose={closeAllPopups}
-                  onUpdateUser={handleUpdateUser}
-                  onOutsideClick={handleOutsideClick}
-                />
 
-                <EditAvatarPopup
-                  isOpen={isEditAvatarPopupOpen}
-                  onClose={closeAllPopups}
-                  onUpdateAvatar={handleUpdateAvatar}
-                  onOutsideClick={handleOutsideClick}
-                />
-
-                <AddPlacePopup
-                  isOpen={isAddPlacePopupOpen}
-                  onClose={closeAllPopups}
-                  onAddPlaceSubmit={handleAddPlaceSubmit}
-                  onOutsideClick={handleOutsideClick}
-                />
-
-                <PopupWithForm
-                  name="confirm-delete"
-                  title="Are you sure?"
-                  onClose={closeAllPopups}
-                />
-
-                <ImagePopup
-                  card={selectedCard}
-                  onClose={closeAllPopups}
-                  onOutsideClick={handleOutsideClick}
-                />
-
-                <MessagePopup
-                  isOpen={isDeletePopupOpen}
-                  onClose={closeAllPopups}
-                  onOutsideClick={handleOutsideClick}
-                >
-                  <h2 className="popup__title popup__title_delete">
-                    Are you sure?
-                  </h2>
-                  <button className="popup__save-btn" name="Yes" type="submit">
-                    Yes
-                  </button>
-                </MessagePopup>
-              </ProtectedRoute>
-
-              <Route path="/login">
-                <Header>
-                  {" "}
-                  <Link className="header__link hover-animate" to="/register">
-                    {" "}
-                    <p>Sign up</p>
-                  </Link>{" "}
-                </Header>
-                <Login 
-                  onSubmit={handleLoginSubmit}
-                  password={password}
-                  setPassword={setPassword}
-                  setEmail={setEmail}
-                  email={email}
+    return (
+      <div className="App">
+        <div className="root">
+          <CurrentUserContext.Provider value={currentUser}>
+            <div className="page-content">
+              <Switch>
+                <ProtectedRoute exact path="/" loggedIn={isLoggedIn}>
+                  <Header 
+                  //add user email
                   />
-              </Route>
-
-              <Route path="/register">
-                <Header>
-                  {" "}
-                  <Link className="header__link hover-animate" to="/login">
-                    {" "}
-                    <p>Log in</p>
-                  </Link>{" "}
-                </Header>
-                <Register 
-                  handleSubmit={handleRegisterSubmit}
-                  password={password}
-                  setPassword={setPassword}
-                  setEmail={setEmail}
-                  email={email}
-
+                  <Main
+                    onEditProfileClick={handleEditProfileClick}
+                    onAddPlaceClick={handleAddPlaceClick}
+                    onEditAvatarClick={handleEditAvatarClick}
+                    onCardClick={handleCardClick}
+                    cards={cards}
+                    onCardLike={handleCardLike}
+                    onCardDelete={handleDeleteCard}
                   />
-              </Route>
-            </Switch>
-                <InfoTooltip
-                  isOpen={isInfoTooltipOpen}
-                  isSuccess={isSuccess}
-                  onClose={closeAllPopups}
-                  onOutsideClick={handleOutsideClick}
-                />
-            <Footer />
-          </div>
-        </CurrentUserContext.Provider>
+
+                  <EditProfilePopup
+                    isOpen={isEditProfilePopupOpen}
+                    onClose={closeAllPopups}
+                    onUpdateUser={handleUpdateUser}
+                    onOutsideClick={handleOutsideClick}
+                  />
+
+                  <EditAvatarPopup
+                    isOpen={isEditAvatarPopupOpen}
+                    onClose={closeAllPopups}
+                    onUpdateAvatar={handleUpdateAvatar}
+                    onOutsideClick={handleOutsideClick}
+                  />
+
+                  <AddPlacePopup
+                    isOpen={isAddPlacePopupOpen}
+                    onClose={closeAllPopups}
+                    onAddPlaceSubmit={handleAddPlaceSubmit}
+                    onOutsideClick={handleOutsideClick}
+                  />
+
+                  <PopupWithForm
+                    name="confirm-delete"
+                    title="Are you sure?"
+                    onClose={closeAllPopups}
+                  />
+
+                  <ImagePopup
+                    card={selectedCard}
+                    onClose={closeAllPopups}
+                    onOutsideClick={handleOutsideClick}
+                  />
+
+                  <MessagePopup
+                    isOpen={isDeletePopupOpen}
+                    onClose={closeAllPopups}
+                    onOutsideClick={handleOutsideClick}
+                  >
+                    <h2 className="popup__title popup__title_delete">
+                      Are you sure?
+                    </h2>
+                    <button
+                      className="popup__save-btn"
+                      name="Yes"
+                      type="submit"
+                    >
+                      Yes
+                    </button>
+                  </MessagePopup>
+                </ProtectedRoute>
+
+                <Route path="/login">
+                  <Header>
+                    {" "}
+                    <Link className="header__link hover-animate" to="/register">
+                      {" "}
+                      <p>Sign up</p>
+                    </Link>{" "}
+                  </Header>
+                  <Login
+                    onSubmit={handleLoginSubmit}
+                    password={password}
+                    setPassword={setPassword}
+                    setEmail={setEmail}
+                    email={email}
+                  />
+                </Route>
+
+                <Route path="/register">
+                  <Header>
+                    {" "}
+                    <Link className="header__link hover-animate" to="/login">
+                      {" "}
+                      <p>Log in</p>
+                    </Link>{" "}
+                  </Header>
+                  <Register
+                    handleSubmit={handleRegisterSubmit}
+                    password={password}
+                    setPassword={setPassword}
+                    setEmail={setEmail}
+                    email={email}
+                  />
+                </Route>
+              </Switch>
+              <InfoTooltip
+                isOpen={isInfoTooltipOpen}
+                isSuccess={isSuccess}
+                onClose={closeAllPopups}
+                onOutsideClick={handleOutsideClick}
+              />
+              <Footer />
+            </div>
+          </CurrentUserContext.Provider>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
+
 
 export default App;
