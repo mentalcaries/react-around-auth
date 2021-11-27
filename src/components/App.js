@@ -1,5 +1,5 @@
 import React from "react";
-import { Switch, Route, Redirect, Link, useHistory } from "react-router-dom";
+import { Switch, Route, Link, useHistory } from "react-router-dom";
 import Header from "./Header";
 import Main from "./Main";
 import PopupWithForm from "./PopupWithForm";
@@ -15,7 +15,7 @@ import Register from "./Register";
 import ProtectedRoute from "./ProtectedRoute";
 import MessagePopup from "./MessagePopup";
 import InfoTooltip from "./InfoTooltip";
-import { register, login } from "../utils/auth";
+import { register, authorise, verifyUser } from "../utils/auth";
 
 function App() {
   const [currentUser, setCurrentUser] = React.useState("");
@@ -29,7 +29,9 @@ function App() {
   const [cards, setCards] = React.useState([]);
   const [isLoggedIn, setIsloggedIn] = React.useState(false);
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
-  const [isNowRegistered, setIsNowRegistered] = React.useState(false);
+  const [isSuccess, setIsSuccess]=React.useState(false)
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
   // const [isAuthorized, setIsAuthorized] = React.useState(false);
 
   React.useEffect(() => {
@@ -37,6 +39,7 @@ function App() {
       setCurrentUser(res);
     });
   }, []);
+
 
   function handleEditAvatarClick() {
     setIsEditAvatarPopupOpen(true);
@@ -127,36 +130,68 @@ function App() {
       closeAllPopups();
     }
   }
-  const history = useHistory();
 
-  function handleRegisterSubmit(userData) {
-    const { password, email } = userData;
+  function handleRegisterSubmit() {
     register(password, email)
-    .then(() => {
-      setIsNowRegistered(true);
-      setIsInfoTooltipOpen(true);
-      setTimeout(()=> {
-        setIsInfoTooltipOpen(false);
-        // setIsNowRegistered(false);
-      }, 1000)
+    .then((res) => {
+      if(res){
+        setIsSuccess(true);
+        setIsInfoTooltipOpen(true);
+        setTimeout(()=> {
+          setIsInfoTooltipOpen(false);
+          // setIsNowRegistered(false);
+        }, 1500)
+        history.push("/login")
+      }
+      else{
+        setIsSuccess(false);
+        setIsInfoTooltipOpen(true)
+      }
     })
     .catch(()=>{
-      setIsNowRegistered(false);
+      setIsSuccess(false);
       setIsInfoTooltipOpen(true);
       setTimeout(()=> {
         setIsInfoTooltipOpen(false);
         // setIsNowRegistered(false);
       }, 1000)
+      
     })
   }
+
+  const history = useHistory()
+
   function handleLoginSubmit({ password, email }) {
     if (!password || !email) {
       return;
     }
-    login(password, email).then(() => {
-      setIsloggedIn(true);
-      history.push("/");
-    });
+    authorise(password, email)
+    .then((data) => {
+      if(!data){
+        return
+      }
+      else {
+        setPassword('')
+        setEmail('')
+        setIsloggedIn(true);
+        history.push("/");
+      }
+    })
+    .catch((err)=>console.log(err))
+    setIsInfoTooltipOpen(true)
+    setIsSuccess(false)
+  }
+
+  function tokenCheck(){
+    const jwt = localStorage.getItem('jwt')
+    if (jwt){
+      verifyUser(jwt)
+      .then((res)=>{
+        setEmail(res.email)
+        setIsloggedIn(true)
+        history.push("/")
+      })
+    }
   }
 
   return (
@@ -232,7 +267,13 @@ function App() {
                     <p>Sign up</p>
                   </Link>{" "}
                 </Header>
-                <Login handleLogin={handleLoginSubmit} />
+                <Login 
+                  onSubmit={handleLoginSubmit}
+                  password={password}
+                  setPassword={setPassword}
+                  setEmail={setEmail}
+                  email={email}
+                  />
               </Route>
 
               <Route path="/register">
@@ -243,15 +284,22 @@ function App() {
                     <p>Log in</p>
                   </Link>{" "}
                 </Header>
-                <Register handleRegister={handleRegisterSubmit} />
+                <Register 
+                  handleSubmit={handleRegisterSubmit}
+                  password={password}
+                  setPassword={setPassword}
+                  setEmail={setEmail}
+                  email={email}
+
+                  />
+              </Route>
+            </Switch>
                 <InfoTooltip
                   isOpen={isInfoTooltipOpen}
-                  isSuccess={isNowRegistered}
+                  isSuccess={isSuccess}
                   onClose={closeAllPopups}
                   onOutsideClick={handleOutsideClick}
                 />
-              </Route>
-            </Switch>
             <Footer />
           </div>
         </CurrentUserContext.Provider>

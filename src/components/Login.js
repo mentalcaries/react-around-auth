@@ -1,26 +1,43 @@
 import React from "react";
 import UserForm from "./UserForm";
 
-function Login({handleLogin}) {
+
+function Login({onSubmit}) {
+
+  const [email, setEmail] = React.useState('')
+  const [password, setPassword] = React.useState('')
+
   // const history = useHistory()
-  // function handleLoginSubmit({password, email}) {
-  //  if(!password || !email){
-  //    return;
-  //  }
-  //   login(password, email)
-  //   .then(()=>{
-  //       //set logged in state to true via handleLogin
-  //       history.push('/')
-      
+
+  // function handleLoginSubmit({ password, email }) {
+  //   if (!password || !email) {
+  //     return;
+  //   }
+  //   authorise(password, email)
+  //   .then((data) => {
+  //     if(data.jwt){
+  //      setPassword('')
+  //      setEmail('')
+  //      setIsloggedIn(true);
+  //      history.push("/");
+  //     }
   //   })
+  //   .catch((err)=>console.log(err))
+  //   setIsInfoTooltipOpen(true)
+  //   setIsSuccess(false)
   // }
+
 
   return (
     <UserForm
       formTitle="Log In"
       formText="Not a member yet? Sign up here!"
       formButton="Log in"
-      onSubmit={handleLogin}
+      onSubmit={onSubmit}
+      email={email}
+      setEmail={setEmail}
+      password={password}
+      setPassword={setPassword}
     />
   );
 }

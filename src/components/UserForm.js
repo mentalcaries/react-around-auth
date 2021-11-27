@@ -1,9 +1,8 @@
 import React from 'react';
 
-function UserForm({ formTitle, formText, formButton, onSubmit }) {
+function UserForm({ formTitle, formText, formButton, email, setEmail, password, setPassword, onSubmit }) {
 
-  const [email, setEmail] = React.useState('')
-  const [password, setPassword] = React.useState('')
+
 
   function handleEmailChange(evt){
     setEmail(evt.target.value)
@@ -31,7 +30,7 @@ function UserForm({ formTitle, formText, formButton, onSubmit }) {
         required
         placeholder="Email"
         onChange={handleEmailChange}
-        value={email.value}
+        value={email}
       ></input>
 
       <input
