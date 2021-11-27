@@ -179,8 +179,8 @@ function App() {
 
   React.useEffect(()=>{
     checkToken()
-  }, [isLoggedIn])
-  
+  }, [isLoggedIn,])
+
   function checkToken() {
     const jwt = localStorage.getItem("jwt");
     if (!jwt) {
