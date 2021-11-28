@@ -33,6 +33,7 @@ function App() {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [userEmail, setUserEmail] = React.useState("");
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const history = useHistory();
 
 
@@ -210,6 +211,10 @@ function App() {
     history.push("/");
   }
 
+  function toggleMenu(){
+    setIsMenuOpen(!isMenuOpen)
+  }
+
   return (
     <div className="App">
       <div className="root">
@@ -217,8 +222,8 @@ function App() {
           <div className="page-content">
             <Switch>
               <ProtectedRoute exact path="/" loggedIn={isLoggedIn}>
-                <Header button={<button className="header__close"/>}>
-                  <div className="header__user">
+                <Header button={<button className={`header__open hover-animate ${isMenuOpen? 'header__close' : ''}`} onClick={toggleMenu} />}>
+                  <div className={`header__user ${!isMenuOpen? 'header__user_collapsed':''}`}>
                     <p className="header__username">{userEmail}</p>
                       <Link to="/" className="header__link hover-animate" onClick={signOut}>
                       Log out
