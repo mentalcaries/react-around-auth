@@ -44,16 +44,17 @@ export function authorise(password, email) {
        return response.json()
       }
       else if (response.status === 400) {
-        throw Error ("one or more of the fields were not provided")
+        throw Error ("One or more of the fields were not provided")
       }
       else if (response.status === 401) {
-          throw Error ("the user with the specified email not found")
+          throw Error ("The user with the specified email not found")
       }
   })
   
   .then((data)=>{
-    if(data.jwt){
-      localStorage.setItem('jwt', data.jwt);
+    console.log('res', data)
+    if(data.token){
+      localStorage.setItem('jwt', data.token);
       return data;
     }
     return; 
@@ -70,6 +71,7 @@ export function verifyUser(token){
       }
     })
     .then((response)=>{
+      console.log(response)
       if (response.status ===400){
         throw Error("Token not provided or provided in the wrong format")
       }

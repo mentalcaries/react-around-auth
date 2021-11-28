@@ -27,13 +27,14 @@ function App() {
   const [isDeletePopupOpen, setIsDeletePopupOpen] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState();
   const [cards, setCards] = React.useState([]);
-  const [isLoggedIn, setIsloggedIn] = React.useState(false);
+  const [isLoggedIn, setIsloggedIn] = React.useState(true);
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [userEmail, setUserEmail] = React.useState("");
-  // const [isAuthorized, setIsAuthorized] = React.useState(false);
+  const history = useHistory();
+
 
   React.useEffect(() => {
     api.getProfileInfo().then((res) => {
@@ -155,7 +156,6 @@ function App() {
       });
   }
 
-  const history = useHistory();
 
   function handleLoginSubmit({ password, email }) {
     if (!password || !email) {
@@ -166,36 +166,48 @@ function App() {
         if (!data) {
           return;
         } else {
+          console.log("data exists")
+          setIsloggedIn(true);
           setPassword("");
           setEmail("");
-          setIsloggedIn(true);
           history.push("/");
         }
       })
-      .catch((err) => console.log(err));
-    setIsInfoTooltipOpen(true);
-    setIsSuccess(false);
+      .catch((err) => {
+        console.log(err);
+        setIsInfoTooltipOpen(true);
+        setIsSuccess(false);
+      });
   }
+
+  const checkToken = React.useCallback(() => {
+    const jwt = localStorage.getItem("jwt");
+    if (jwt) {
+      verifyUser(jwt)
+        .then((res) => {
+          if (!res) {
+            return;
+          } else {
+            console.log(res)
+            setUserEmail(res.email);
+            setIsloggedIn(true);
+            history.push("/");
+          }
+        })
+        .catch((err) => {
+          console.log("Error", err);
+        });
+    }
+  }, [history]);
 
   React.useEffect(() => {
     checkToken();
-  }, [isLoggedIn]);
+  }, [checkToken]);
 
-  function checkToken() {
-    const jwt = localStorage.getItem("jwt");
-    if (!jwt) {
-      //handle error case
-      // throw Error ("Invalid JWT")
-      return;
-    } else {
-      verifyUser(jwt).then((res) => {
-        if (!res) {
-          return;
-        } else setUserEmail(res.email);
-        setIsloggedIn(true);
-        history.push("/");
-      });
-    }
+  function signOut() {
+    localStorage.removeItem("jwt");
+    setIsloggedIn(false);
+    history.push("/login");
   }
 
   return (
@@ -205,9 +217,14 @@ function App() {
           <div className="page-content">
             <Switch>
               <ProtectedRoute exact path="/" loggedIn={isLoggedIn}>
-                <Header
-                //add user email
-                />
+                <Header>
+                  <div className="header__user">
+                    <p>{userEmail}</p>
+                    <Link className="header__link" onClick={signOut}>
+                      Log out
+                    </Link>
+                  </div>
+                </Header>
                 <Main
                   onEditProfileClick={handleEditProfileClick}
                   onAddPlaceClick={handleAddPlaceClick}
