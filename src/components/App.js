@@ -164,6 +164,8 @@ function App() {
     authorise(password, email)
       .then((data) => {
         if (!data) {
+          setIsInfoTooltipOpen(true);
+        setIsSuccess(false);
           return;
         } else {
           setIsloggedIn(true);
@@ -215,7 +217,7 @@ function App() {
           <div className="page-content">
             <Switch>
               <ProtectedRoute exact path="/" loggedIn={isLoggedIn}>
-                <Header>
+                <Header button={<button className="header__close"/>}>
                   <div className="header__user">
                     <p className="header__username">{userEmail}</p>
                       <Link to="/" className="header__link hover-animate" onClick={signOut}>

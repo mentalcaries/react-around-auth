@@ -1,0 +1,11 @@
+.header__main{
+    
+}
+
+@media screen and (max-width: 680px) {
+    .header__main {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+  }
