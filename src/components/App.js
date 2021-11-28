@@ -27,7 +27,7 @@ function App() {
   const [isDeletePopupOpen, setIsDeletePopupOpen] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState();
   const [cards, setCards] = React.useState([]);
-  const [isLoggedIn, setIsloggedIn] = React.useState(true);
+  const [isLoggedIn, setIsloggedIn] = React.useState(false);
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
   const [email, setEmail] = React.useState("");
@@ -166,7 +166,6 @@ function App() {
         if (!data) {
           return;
         } else {
-          console.log("data exists")
           setIsloggedIn(true);
           setPassword("");
           setEmail("");
@@ -188,8 +187,7 @@ function App() {
           if (!res) {
             return;
           } else {
-            console.log(res)
-            setUserEmail(res.email);
+            setUserEmail(res.data.email);
             setIsloggedIn(true);
             history.push("/");
           }
@@ -207,7 +205,7 @@ function App() {
   function signOut() {
     localStorage.removeItem("jwt");
     setIsloggedIn(false);
-    history.push("/login");
+    history.push("/");
   }
 
   return (
@@ -219,8 +217,8 @@ function App() {
               <ProtectedRoute exact path="/" loggedIn={isLoggedIn}>
                 <Header>
                   <div className="header__user">
-                    <p>{userEmail}</p>
-                    <Link className="header__link" onClick={signOut}>
+                    <p className="header__username">{userEmail}</p>
+                      <Link to="/" className="header__link hover-animate" onClick={signOut}>
                       Log out
                     </Link>
                   </div>

@@ -52,7 +52,6 @@ export function authorise(password, email) {
   })
   
   .then((data)=>{
-    console.log('res', data)
     if(data.token){
       localStorage.setItem('jwt', data.token);
       return data;
@@ -71,7 +70,6 @@ export function verifyUser(token){
       }
     })
     .then((response)=>{
-      console.log(response)
       if (response.status ===400){
         throw Error("Token not provided or provided in the wrong format")
       }
@@ -82,6 +80,5 @@ export function verifyUser(token){
         return response.json()
       }
     })
-    // .then(data=>data)
-    .then(data=>console.log(data))
+    .then(data=>data)
 }
