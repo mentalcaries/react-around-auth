@@ -1,23 +1,32 @@
-import React from 'react';
+import React from "react";
+import { Link } from "react-router-dom";
 
-function UserForm({ formTitle, formText, formButton, email, setEmail, password, setPassword, onSubmit }) {
-
-
-
-  function handleEmailChange(evt){
-    setEmail(evt.target.value)
+function UserForm({
+  formTitle,
+  formText,
+  formLink,
+  linkText,
+  formButton,
+  email,
+  setEmail,
+  password,
+  setPassword,
+  onSubmit,
+}) {
+  function handleEmailChange(evt) {
+    setEmail(evt.target.value);
   }
 
-  function handlePasswordChange(evt){
-    setPassword(evt.target.value)
+  function handlePasswordChange(evt) {
+    setPassword(evt.target.value);
   }
 
-  function handleSubmit(evt){
+  function handleSubmit(evt) {
     evt.preventDefault();
     onSubmit({
-        password, 
-        email
-    })
+      password,
+      email,
+    });
   }
 
   return (
@@ -43,10 +52,19 @@ function UserForm({ formTitle, formText, formButton, email, setEmail, password, 
         value={password}
       ></input>
 
-      <button className="user-form__button hover-animate" type="submit" default="Log in">
+      <button
+        className="user-form__button hover-animate"
+        type="submit"
+        default="Log in"
+      >
         {formButton}
       </button>
-      <p className="user-form__text">{formText}</p>
+      <p className="user-form__text">
+        {formText}{" "}
+        <Link className="user-form__text hover-animate" to={formLink}>
+          {linkText}{" "}
+        </Link>{" "}
+      </p>
     </form>
   );
 }

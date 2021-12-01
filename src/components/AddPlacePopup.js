@@ -18,6 +18,7 @@ function AddPlacePopup({isOpen, onClose, onAddPlaceSubmit, onOutsideClick}) {
       name: title,
       link,
       owner: {_id: currentUser._id},
+      // likes: []
 
     });
   }

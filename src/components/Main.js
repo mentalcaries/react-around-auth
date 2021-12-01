@@ -52,7 +52,7 @@ function Main({
         {cards.map((card) => (
           <Card
             card={card}
-            key={card._id}
+            key={card._id && card._id}
             onCardClick={onCardClick}
             onCardLike={onCardLike}
             onCardDelete={onCardDelete}

@@ -10,7 +10,9 @@ function Login({onSubmit}) {
   return (
     <UserForm
       formTitle="Log In"
-      formText="Not a member yet? Sign up here!"
+      formText="Not a member yet?"
+      formLink="/register"
+      linkText="Sign up here!"
       formButton="Log in"
       onSubmit={onSubmit}
       email={email}

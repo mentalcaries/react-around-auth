@@ -79,7 +79,11 @@ function App() {
   function handleUpdateUser(userInfo) {
     api
       .setProfileInfo(userInfo)
-      .then((res) => setCurrentUser(res), closeAllPopups());
+      .then((res) => {
+        setCurrentUser(res); 
+        closeAllPopups();
+        
+      })
   }
 
   function handleUpdateAvatar(link) {
@@ -133,16 +137,6 @@ function App() {
     isInfoTooltipOpen ||
     selectedCard;
 
-  // React.useEffect(() => {
-  //   anyPopupOpen
-  //     ? document.addEventListener("keydown", handleEscape)
-  //     : document.removeEventListener("keydown", handleEscape);
-  // });
-  // function handleEscape(evt) {
-  //   if (evt.key === "Escape") {
-  //     closeAllPopups();
-  //   }
-  // }
 
   React.useEffect(() => {
     const closeByEscape = (e) => {
@@ -198,6 +192,7 @@ function App() {
         } else {
           setIsloggedIn(true);
           setPassword("");
+          setUserEmail(email)
           setEmail("");
           history.push("/");
         }
@@ -235,12 +230,14 @@ function App() {
   function signOut() {
     localStorage.removeItem("jwt");
     setIsloggedIn(false);
+    setUserEmail("")
     history.push("/");
   }
 
   function toggleMenu() {
     setIsMenuOpen(!isMenuOpen);
   }
+
 
   return (
     <div className="App">
