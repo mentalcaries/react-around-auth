@@ -2,7 +2,7 @@
 @import url(./vendor/fonts/fonts.css);
 @import url(./blocks/root/root.css);
 @import url(./blocks/page-content/page-content.css);
-
+@import url(./blocks/App/App.css);
 
 /* Header */
 @import url(./blocks/header/header.css);
@@ -79,3 +79,4 @@
 
 /* Animation */
 @import url(./blocks/hover-animate/hover-animate.css);
+

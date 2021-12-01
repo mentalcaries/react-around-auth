@@ -18,14 +18,14 @@ import InfoTooltip from "./InfoTooltip";
 import { register, authorise, verifyUser } from "../utils/auth";
 
 function App() {
-  const [currentUser, setCurrentUser] = React.useState("");
+  const [currentUser, setCurrentUser] = React.useState({});
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] =
     React.useState(false);
   const [isEditProfilePopupOpen, setIspProfilePopupOpen] =
     React.useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
   const [isDeletePopupOpen, setIsDeletePopupOpen] = React.useState(false);
-  const [selectedCard, setSelectedCard] = React.useState();
+  const [selectedCard, setSelectedCard] = React.useState(null);
   const [cards, setCards] = React.useState([]);
   const [isLoggedIn, setIsloggedIn] = React.useState(false);
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
@@ -33,14 +33,16 @@ function App() {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [userEmail, setUserEmail] = React.useState("");
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false)
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const history = useHistory();
 
-
   React.useEffect(() => {
-    api.getProfileInfo().then((res) => {
-      setCurrentUser(res);
-    });
+    api
+      .getProfileInfo()
+      .then((res) => {
+        setCurrentUser(res);
+      })
+      .catch((err) => console.log(err));
   }, []);
 
   function handleEditAvatarClick() {
@@ -63,10 +65,9 @@ function App() {
     setIsEditAvatarPopupOpen(false);
     setIspProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
-    setSelectedCard(false);
+    setSelectedCard(null);
     setIsDeletePopupOpen(false);
     setIsInfoTooltipOpen(false);
-    document.removeEventListener("keydown", handleEscape);
   }
 
   function handleOutsideClick(evt) {
@@ -82,35 +83,46 @@ function App() {
   }
 
   function handleUpdateAvatar(link) {
-    api
-      .updateProfilePicture(link)
-      .then((res) => setCurrentUser(res), closeAllPopups());
+    api.updateProfilePicture(link).then((res) => {
+      setCurrentUser(res);
+      closeAllPopups();
+    })
+    .catch((err)=>console.log(err))
   }
 
   function handleAddPlaceSubmit(newCard) {
     api
       .addNewCard(newCard)
-      .then(setCards([newCard, ...cards]), closeAllPopups());
+      .then(()=>{
+        setCards([newCard, ...cards]);
+        closeAllPopups();
+      })
+      .catch((err)=>console.log(err))
   }
 
   React.useEffect(() => {
     api
       .getCards()
       //.then(cards=>console.log(cards))
-      .then((cards) => setCards(cards));
+      .then((cards) => setCards(cards))
+      .catch((err)=>console.log(err))
   }, []);
 
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
     api.changeCardStatus(card._id, isLiked).then((newCard) => {
       setCards((state) => state.map((c) => (c._id === card._id ? newCard : c)));
-    });
+    })
+    .catch((err)=>console.log(err))
   }
 
   function handleDeleteCard(card) {
     api
       .deleteCard(card._id)
-      .then(setCards((cards) => cards.filter((c) => c._id !== card._id)));
+      .then(()=>{
+        setCards((cards) => cards.filter((c) => c._id !== card._id))
+      })
+      .catch((err)=>console.log(err))
   }
 
   const anyPopupOpen =
@@ -121,42 +133,57 @@ function App() {
     isInfoTooltipOpen ||
     selectedCard;
 
-  React.useEffect(() => {
-    anyPopupOpen
-      ? document.addEventListener("keydown", handleEscape)
-      : document.removeEventListener("keydown", handleEscape);
-  });
+  // React.useEffect(() => {
+  //   anyPopupOpen
+  //     ? document.addEventListener("keydown", handleEscape)
+  //     : document.removeEventListener("keydown", handleEscape);
+  // });
+  // function handleEscape(evt) {
+  //   if (evt.key === "Escape") {
+  //     closeAllPopups();
+  //   }
+  // }
 
-  function handleEscape(evt) {
-    if (evt.key === "Escape") {
-      closeAllPopups();
+  React.useEffect(() => {
+    const closeByEscape = (e) => {
+      if (e.key === 'Escape') {
+        closeAllPopups();
+      }
     }
-  }
+
+  anyPopupOpen &&  document.addEventListener('keydown', closeByEscape)
+    
+    return () => document.removeEventListener('keydown', closeByEscape)
+}, [anyPopupOpen])
+
 
   function handleRegisterSubmit() {
     register(password, email)
       .then((res) => {
         if (res) {
           setIsSuccess(true);
-          setIsInfoTooltipOpen(true);
+          // setIsInfoTooltipOpen(true);
           setTimeout(() => {
             setIsInfoTooltipOpen(false);
           }, 1500);
           history.push("/login");
         } else {
           setIsSuccess(false);
-          setIsInfoTooltipOpen(true);
+          // setIsInfoTooltipOpen(true);
         }
       })
       .catch(() => {
         setIsSuccess(false);
-        setIsInfoTooltipOpen(true);
+        // setIsInfoTooltipOpen(true);
+        
+      })
+      .finally(()=>{
+        setIsInfoTooltipOpen(true)
         setTimeout(() => {
           setIsInfoTooltipOpen(false);
         }, 1000);
-      });
+      })
   }
-
 
   function handleLoginSubmit({ password, email }) {
     if (!password || !email) {
@@ -166,7 +193,7 @@ function App() {
       .then((data) => {
         if (!data) {
           setIsInfoTooltipOpen(true);
-        setIsSuccess(false);
+          setIsSuccess(false);
           return;
         } else {
           setIsloggedIn(true);
@@ -211,8 +238,8 @@ function App() {
     history.push("/");
   }
 
-  function toggleMenu(){
-    setIsMenuOpen(!isMenuOpen)
+  function toggleMenu() {
+    setIsMenuOpen(!isMenuOpen);
   }
 
   return (
@@ -222,10 +249,27 @@ function App() {
           <div className="page-content">
             <Switch>
               <ProtectedRoute exact path="/" loggedIn={isLoggedIn}>
-                <Header button={<button className={`header__open hover-animate ${isMenuOpen? 'header__close' : ''}`} onClick={toggleMenu} />}>
-                  <div className={`header__user ${!isMenuOpen? 'header__user_collapsed':''}`}>
+                <Header
+                  button={
+                    <button
+                      className={`header__open hover-animate ${
+                        isMenuOpen ? "header__close" : ""
+                      }`}
+                      onClick={toggleMenu}
+                    />
+                  }
+                >
+                  <div
+                    className={`header__user ${
+                      !isMenuOpen ? "header__user_collapsed" : ""
+                    }`}
+                  >
                     <p className="header__username">{userEmail}</p>
-                      <Link to="/" className="header__link hover-animate" onClick={signOut}>
+                    <Link
+                      to="/"
+                      className="header__link hover-animate"
+                      onClick={signOut}
+                    >
                       Log out
                     </Link>
                   </div>
