@@ -12,6 +12,13 @@ function AddPlacePopup({isOpen, onClose, onAddPlaceSubmit, onOutsideClick}) {
   const titleRef = React.useRef();
   const linkRef = React.useRef();
 
+  React.useEffect(() => {
+    setTitle('');
+    setLink('');
+    setIsLinkValid(false);
+    setIsTitleValid(false);
+  }, [isOpen]);
+
   function handleSubmit(evt) {
     evt.preventDefault();
     onAddPlaceSubmit({
@@ -19,12 +26,8 @@ function AddPlacePopup({isOpen, onClose, onAddPlaceSubmit, onOutsideClick}) {
       link,
       owner: {_id: currentUser._id},
       likes: [],
-      _id: '', 
-
-    })
-    .then()
-    setTitle('');
-    setLink('');
+      _id: '',
+    });
   }
 
   function handleTitleChange(evt) {
@@ -36,6 +39,8 @@ function AddPlacePopup({isOpen, onClose, onAddPlaceSubmit, onOutsideClick}) {
     setLink(evt.target.value);
     setIsLinkValid(evt.target.validity.valid);
   }
+
+
 
   return (
     <PopupWithForm
@@ -59,7 +64,7 @@ function AddPlacePopup({isOpen, onClose, onAddPlaceSubmit, onOutsideClick}) {
         maxLength="30"
         onChange={handleTitleChange}
         ref={titleRef}
-        value={title.value}
+        value={title}
       />
 
       <span
@@ -80,7 +85,7 @@ function AddPlacePopup({isOpen, onClose, onAddPlaceSubmit, onOutsideClick}) {
         required
         onChange={handleLinkChange}
         ref={linkRef}
-        value={link.value}
+        value={link}
       />
 
       <span
