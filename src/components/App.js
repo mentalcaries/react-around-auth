@@ -84,6 +84,7 @@ function App() {
         closeAllPopups();
         
       })
+      .catch((err)=>console.log(err))
   }
 
   function handleUpdateAvatar(link) {
@@ -100,6 +101,7 @@ function App() {
       .then(()=>{
         setCards([newCard, ...cards]);
         closeAllPopups();
+        
       })
       .catch((err)=>console.log(err))
   }
@@ -110,7 +112,7 @@ function App() {
       //.then(cards=>console.log(cards))
       .then((cards) => setCards(cards))
       .catch((err)=>console.log(err))
-  }, []);
+  }, [cards]);
 
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
