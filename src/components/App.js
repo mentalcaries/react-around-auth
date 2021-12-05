@@ -61,6 +61,10 @@ function App() {
     setSelectedCard(clickedCard);
   }
 
+  function handleDeleteclick(){
+    setIsDeletePopupOpen(true)
+  }
+
   function closeAllPopups() {
     setIsEditAvatarPopupOpen(false);
     setIspProfilePopupOpen(false);
@@ -98,8 +102,8 @@ function App() {
   function handleAddPlaceSubmit(newCard) {
     api
       .addNewCard(newCard)
-      .then(()=>{
-        setCards([newCard, ...cards]);
+      .then((addedCard)=>{
+        setCards([addedCard, ...cards]);
         closeAllPopups();
         
       })
@@ -109,7 +113,6 @@ function App() {
   React.useEffect(() => {
     api
       .getCards()
-      //.then(cards=>console.log(cards))
       .then((cards) => setCards(cards))
       .catch((err)=>console.log(err))
   }, [cards]);
