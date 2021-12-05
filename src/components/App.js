@@ -61,9 +61,9 @@ function App() {
     setSelectedCard(clickedCard);
   }
 
-  function handleDeleteclick(){
-    setIsDeletePopupOpen(true)
-  }
+  // function handleDeleteclick(){
+  //   setIsDeletePopupOpen(true)
+  // }
 
   function closeAllPopups() {
     setIsEditAvatarPopupOpen(false);
@@ -115,7 +115,7 @@ function App() {
       .getCards()
       .then((cards) => setCards(cards))
       .catch((err)=>console.log(err))
-  }, [cards]);
+  }, []);
 
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
